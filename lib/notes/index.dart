@@ -1,7 +1,11 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:notekeeper/categories/index.dart';
 import 'package:notekeeper/widgets/header_widget.dart';
+
+import 'favourite.dart';
+import 'note_page.dart';
 
 class Note extends StatefulWidget {
   const Note({Key? key}) : super(key: key);
@@ -11,65 +15,38 @@ class Note extends StatefulWidget {
 }
 
 class _NoteState extends State<Note> {
+
+  int currentTabIndex = 0;
+
+  late List<Widget> pages;
+
+  late Widget currentPage;
+
+  late NotePage notesPage;
+  late Favorites favoritesPage;
+  late Categories categoriesPage;
+
+  @override
+  void initState() {
+
+    notesPage = NotePage();
+
+    favoritesPage = Favorites();
+
+    categoriesPage = Categories();
+
+    pages = [notesPage, favoritesPage, categoriesPage];
+
+    currentPage = notesPage;
+
+    super.initState();
+  }
+
   @override
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        maintainBottomViewPadding: true,
-        child: Column(
-          children: <Widget>[
-            HeaderWidget('notes'),
-            SizedBox(height: 20.0),
-            Expanded(
-              child: GridView.builder(
-                itemCount: 20,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.3,
-                      crossAxisSpacing: 13.0,
-                      mainAxisSpacing: 20.0
-                  ),
-                itemBuilder: (BuildContext context, int index){
-                  return SizedBox(
-                    height: double.infinity,
-                    child: Card(
-                      elevation: 5.0,
-                      semanticContainer: true,
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: (){
-                              setState(() {
-                                print('hello world $index');
-                              });
-                            },
-                            child: ListTile(
-                              subtitle: Text(
-                                  'Music by Julie Gable. Lyrics by Sidney Stein.',
-                                  style: TextStyle(
-                                      fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                  // return Image.network(images[index]);
-                },
-              ),
-            ),
-            SizedBox(height: 20.0)
-          ],
-        ),
-      ),
+      body: currentPage,
       bottomNavigationBar: CurvedNavigationBar(
         key: _bottomNavigationKey,
         index: 0,
@@ -86,7 +63,8 @@ class _NoteState extends State<Note> {
         animationDuration: Duration(milliseconds: 600),
         onTap: (index) {
           setState(() {
-
+            currentTabIndex = index;
+            currentPage = pages[index];
             print('$index');
           });
         },
@@ -96,34 +74,4 @@ class _NoteState extends State<Note> {
   }
 }
 
-Future createNotePad (context) {
-  return showMaterialModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        child: Text('Hellow World'),
-      )
-  );
-}
 
-// showModalBottomSheet<void>(
-// context: context,
-// builder: (BuildContext context) {
-// return Container(
-// height: 500,
-// color: Colors.amber,
-// child: Center(
-// child: Column(
-// mainAxisAlignment: MainAxisAlignment.center,
-// mainAxisSize: MainAxisSize.min,
-// children: <Widget>[
-// const Text('Modal BottomSheet'),
-// ElevatedButton(
-// child: const Text('Close BottomSheet'),
-// onPressed: () => Navigator.pop(context),
-// ),
-// ],
-// ),
-// ),
-// );
-// },
-// );

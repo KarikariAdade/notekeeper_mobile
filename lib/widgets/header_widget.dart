@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:notekeeper/widgets/notes_widgets.dart';
+
+import 'header_buttons.dart';
 
 class HeaderWidget extends StatefulWidget {
 
@@ -47,50 +51,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 9.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: (){},
-                  child: Container(
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black,
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ]
-                    ),
-                    child: Icon(Icons.add_circle_outline_outlined, color: Theme.of(context).primaryColor,),
-                  ),
-                ),
-                SizedBox(width: 10.0),
-                GestureDetector(
-                  onTap: (){},
-                  child: Container(
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(30.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black,
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ]
-                    ),
-                    child: Icon(Icons.favorite_border, color: Colors.white,),
-                  ),
-                ),
-              ],
-            ),
+            child: widget.pageName != 'favorites' ? HeaderButtons(widget.pageName): Container(),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(8.0, 90.0, 8.0, 8.0),
@@ -99,7 +60,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
                 Container(
                   alignment: Alignment.bottomLeft,
                   child: Text(
-                    'Good Evening, Karikari, ${widget.pageName}',
+                    widget.pageName == 'notes' ? 'Good Evening, Karikari' : '${widget.pageName.toUpperCase()}',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -125,3 +86,8 @@ class _HeaderWidgetState extends State<HeaderWidget> {
         ]);
   }
 }
+
+
+
+
+
