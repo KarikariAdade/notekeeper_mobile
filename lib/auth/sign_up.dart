@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:notekeeper/api/auth.dart';
 import 'package:notekeeper/auth/login.dart';
 
+import '../api/auth.dart';
 import '../widgets/form_outline.dart';
 
 class SignUp extends StatefulWidget {
@@ -11,6 +13,20 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+
+  late String full_name;
+  late String email_address;
+  late String password;
+  late String password_confirmation;
+
+  late bool show_password = false;
+
+  late Object data = [];
+
+  late AuthRequest authRequest = new AuthRequest();
+
+  var formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,71 +83,148 @@ class _SignUpState extends State<SignUp> {
                         ],
                       ),
                       const SizedBox(height: 30.0,),
-                      Column(
-                        children: <Widget>[
-                          TextFormField(
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIcon: Icon(
-                                  Icons.account_circle_outlined,
-                                  color: Theme.of(context).primaryColor,
-                              ),
-                              hintText: 'Full Name',
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
-                              border: generateOutlineBorder(Theme.of(context).primaryColor)
-                            ),
-                          ),
-                          const SizedBox(height: 20.0),
-                          TextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIcon: Icon(
-                                  Icons.email,
-                                  color: Theme.of(context).primaryColor,
-                              ),
-                              hintText: 'Email Address',
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
-                                border: generateOutlineBorder(Theme.of(context).primaryColor)
-                            ),
-                          ),
-                          const SizedBox(height: 20.0),
-                          TextFormField(
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIcon: Icon(
-                                  Icons.lock,
-                                  color: Theme.of(context).primaryColor,
-                              ),
-                              hintText: 'Password',
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
-                                border: generateOutlineBorder(Theme.of(context).primaryColor)
-                            ),
-                          ),
-                          const SizedBox(height: 20.0),
-                          TextFormField(
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              validator: (value){
+                                if(value == null || value.isEmpty){
+                                  return 'Full Name is Required';
+                                }
+                                full_name = value;
+                                return null;
+                              },
+                              keyboardType: TextInputType.text,
+                              decoration: InputDecoration(
                                 filled: true,
+                                fillColor: Colors.white,
                                 prefixIcon: Icon(
-                                  Icons.lock_open,
-                                  color: Theme.of(context).primaryColor,
+                                    Icons.account_circle_outlined,
+                                    color: Theme.of(context).primaryColor,
                                 ),
-                                hintText: 'Confirm Password',
+                                hintText: 'Full Name',
                                 hintStyle: TextStyle(fontSize: 20.0),
                                 focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
                                 border: generateOutlineBorder(Theme.of(context).primaryColor)
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 20.0),
+                            TextFormField(
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value){
+                                if(value == null || value.isEmpty){
+                                  return 'Email Address required';
+                                }
+                                if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                    .hasMatch(value)){
+                                  return 'Invalid Email Address';
+                                }
+
+                                email_address = value;
+                              },
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                prefixIcon: Icon(
+                                    Icons.email,
+                                    color: Theme.of(context).primaryColor,
+                                ),
+                                hintText: 'Email Address',
+                                hintStyle: TextStyle(fontSize: 20.0),
+                                focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
+                                  border: generateOutlineBorder(Theme.of(context).primaryColor)
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+                            TextFormField(
+                              obscureText: show_password ? false : true,
+                              keyboardType: TextInputType.text,
+                              validator: (value) {
+                                if(value == null || value.isEmpty){
+                                  return 'Password field is required';
+                                }
+
+                                if(value.length < 8){
+                                  return 'Password should be more than 8 characters';
+                                }
+
+                                password = value;
+
+                              },
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                prefixIcon: Icon(
+                                    Icons.lock,
+                                    color: Theme.of(context).primaryColor,
+                                ),
+                                suffixIcon: GestureDetector(
+                                  onTap:(){
+                                    setState(() {
+                                      if(show_password){
+                                        show_password = false;
+                                      }else{
+                                        show_password = true;
+                                      }
+                                    });
+                                  },
+                                  child: Icon(
+                                      show_password ? Icons.visibility : Icons.visibility_off_outlined,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                                hintText: 'Password',
+                                hintStyle: TextStyle(fontSize: 20.0),
+                                focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
+                                  border: generateOutlineBorder(Theme.of(context).primaryColor)
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+                            TextFormField(
+                              keyboardType: TextInputType.text,
+                              obscureText: show_password ? false : true,
+                              validator: (value) {
+                                if(value == null || value.isEmpty){
+                                  return 'Confirm Password field is required';
+                                }
+
+                                if(password != value){
+                                  return 'Passwords do not match';
+                                }
+
+                                password_confirmation = value;
+
+                              },
+                              decoration: InputDecoration(
+                                  filled: true,
+                                  prefixIcon: Icon(
+                                    Icons.lock_open,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    onTap:(){
+                                      setState(() {
+                                        if(show_password){
+                                          show_password = false;
+                                        }else{
+                                          show_password = true;
+                                        }
+                                      });
+                                    },
+                                    child: Icon(
+                                      show_password ? Icons.visibility : Icons.visibility_off_outlined,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                  hintText: 'Confirm Password',
+                                  hintStyle: TextStyle(fontSize: 20.0),
+                                  focusedBorder: generateOutlineBorder(Theme.of(context).primaryColor),
+                                  border: generateOutlineBorder(Theme.of(context).primaryColor)
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 30.0,),
                       Container(
@@ -165,7 +258,29 @@ class _SignUpState extends State<SignUp> {
                           ]
                         ),
                         child: GestureDetector(
-                          onTap: (){},
+                          onTap: (){
+                            if(formKey.currentState!.validate()){
+                              formKey.currentState!.save();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    backgroundColor: Colors.blue,
+                                    content: Text(
+                                      "Incorrect phone number or password",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    duration: Duration(seconds: 4),
+                              ));
+                              data = {
+                                "full_name": full_name,
+                                "email": email_address,
+                                "password": password,
+                                "password_confirmation": password_confirmation
+                              };
+
+                              authRequest.signUp(data);
+
+                            }
+                          },
                           child: Center(
                             child: Text(
                                 'Sign Up',

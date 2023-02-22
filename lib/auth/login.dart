@@ -13,6 +13,11 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
+  late String email_address;
+  late String password;
+  GlobalKey<FormState> loginFormKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

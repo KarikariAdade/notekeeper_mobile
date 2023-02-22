@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notekeeper/notes/details.dart';
 
 import '../widgets/header_widget.dart';
 
@@ -45,6 +46,7 @@ class _NotePageState extends State<NotePage> {
                           GestureDetector(
                             onTap: (){
                               setState(() {
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NoteDetails(index)));
                                 print('hello world $index');
                               });
                             },
