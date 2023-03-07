@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:notekeeper/api/helpers.dart';
 import 'package:notekeeper/notes/details.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/header_widget.dart';
 
@@ -11,6 +13,8 @@ class NotePage extends StatefulWidget {
 }
 
 class _NotePageState extends State<NotePage> {
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

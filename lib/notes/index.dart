@@ -1,11 +1,68 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:notekeeper/api/helpers.dart';
+import 'package:notekeeper/auth/login.dart';
 import 'package:notekeeper/categories/index.dart';
 import 'package:notekeeper/widgets/header_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'favourite.dart';
 import 'note_page.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  bool isAuthenticated = false;
+
+  Helpers helpers = Helpers();
+
+  Object userData = {};
+
+
+  @override
+
+  void initState() {
+    validateLoggedInUser();
+
+
+    print('is AUTHENTICATED NEW : $isAuthenticated');
+    super.initState();
+  }
+
+  void validateLoggedInUser() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    helpers.token = localStorage.getString('token')!;
+    print("THIS IS THE TOKEN before if ${helpers.token}");
+    if(helpers.token != null){
+      setState(() {
+        isAuthenticated = true;
+        userData = {
+          'name': localStorage.getString('name'),
+          'email': localStorage.getString('email'),
+          'id': localStorage.getInt('id'),
+        };
+      });
+
+      print('after token >>>>> $isAuthenticated');
+      print('user data token >>>>> ${userData}');
+    }else{
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    }
+  }
+
+  Widget build(BuildContext context) {
+    return isAuthenticated == true ? Note() : Login();
+  }
+}
+
+
 
 class Note extends StatefulWidget {
   const Note({Key? key}) : super(key: key);
@@ -26,6 +83,8 @@ class _NoteState extends State<Note> {
   late Favorites favoritesPage;
   late Categories categoriesPage;
 
+
+
   @override
   void initState() {
 
@@ -41,6 +100,8 @@ class _NoteState extends State<Note> {
 
     super.initState();
   }
+
+
 
   @override
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();

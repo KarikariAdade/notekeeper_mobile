@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:notekeeper/api/auth.dart';
+import 'package:notekeeper/api/helpers.dart';
 import 'package:notekeeper/auth/login.dart';
+import 'package:notekeeper/widgets/loading_dialog.dart';
 
 import '../api/auth.dart';
 import '../widgets/form_outline.dart';
@@ -16,7 +21,7 @@ class _SignUpState extends State<SignUp> {
 
   late String full_name;
   late String email_address;
-  late String password;
+  late String? password;
   late String password_confirmation;
 
   late bool show_password = false;
@@ -25,7 +30,32 @@ class _SignUpState extends State<SignUp> {
 
   late AuthRequest authRequest = new AuthRequest();
 
+  Helpers helpers = Helpers();
+
   var formKey = GlobalKey<FormState>();
+
+
+  void sign_up_user(data) async {
+    setState(() {
+      showLoaderDialog(context);
+    });
+
+    var res = await authRequest.signUp(data);
+
+    var response = json.decode(res.body);
+
+    print("This is the actual await function ${response}");
+
+    if(response['code'] != 200){
+      Navigator.pop(context);
+      helpers.displayHttpMessage(context, "${response['msg']}", 402);
+
+    }else{
+      helpers.displayHttpMessage(context, "${response['msg']}", 200);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +89,7 @@ class _SignUpState extends State<SignUp> {
                   padding: EdgeInsets.all(20.0),
                   child: Column(
                     children: [
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -259,25 +290,22 @@ class _SignUpState extends State<SignUp> {
                         ),
                         child: GestureDetector(
                           onTap: (){
+
                             if(formKey.currentState!.validate()){
                               formKey.currentState!.save();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Colors.blue,
-                                    content: Text(
-                                      "Incorrect phone number or password",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                    duration: Duration(seconds: 4),
-                              ));
                               data = {
-                                "full_name": full_name,
+                                "name": full_name,
                                 "email": email_address,
                                 "password": password,
                                 "password_confirmation": password_confirmation
                               };
+                              // setState(() {
+                                sign_up_user(data);
+                              // });
 
-                              authRequest.signUp(data);
+                              //
+                              //
+                              // authRequest.signUp(data);
 
                             }
                           },
@@ -300,4 +328,5 @@ class _SignUpState extends State<SignUp> {
     );
   }
 }
+
 

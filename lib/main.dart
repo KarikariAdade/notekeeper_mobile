@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notekeeper/auth/login.dart';
+import 'package:notekeeper/splash/index.dart';
 
 import 'auth/sign_up.dart';
 
@@ -9,6 +10,6 @@ void main() => runApp(MaterialApp(
       primaryColor: const Color(0xff162671)
     ),
     home: SafeArea(
-    child: Login(),
+    child: SplashScreen(),
   )
 ));

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:notekeeper/widgets/notes_widgets.dart';
+import 'package:notekeeper/auth/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../api/helpers.dart';
 import 'header_buttons.dart';
 
 class HeaderWidget extends StatefulWidget {
@@ -16,8 +17,42 @@ class HeaderWidget extends StatefulWidget {
 
 class _HeaderWidgetState extends State<HeaderWidget> {
 
+  var userData = {};
+
+  var token = '';
+
+  Helpers helpers = Helpers();
 
   @override
+  void initState() {
+    validateLoggedInUser();
+
+    // TODO: implement initState
+    super.initState();
+
+
+  }
+
+  void validateLoggedInUser() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    helpers.token = localStorage.getString('token')!;
+    print("THIS IS THE TOKEN before if ${helpers.token}");
+    if(helpers.token != null){
+      setState(() {
+        userData = {
+          'name': localStorage.getString('name'),
+          'email': localStorage.getString('email'),
+          'id': localStorage.getInt('id'),
+        };
+      });
+
+      print('user data token >>>>> ${userData}');
+    }else{
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    }
+  }
+
+
   Widget build(BuildContext context) {
     return Stack(
         children: <Widget>[
@@ -60,7 +95,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
                 Container(
                   alignment: Alignment.bottomLeft,
                   child: Text(
-                    widget.pageName == 'notes' ? 'Good Evening, Karikari' : '${widget.pageName.toUpperCase()}',
+                    widget.pageName == 'notes' ? "Good Evening, ${userData['name']}" : '${widget.pageName.toUpperCase()}',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
